@@ -45,7 +45,7 @@ template<int INPUT, int HIDDEN, int OUTPUT>
 class trainer
 {
 public:
-    trainer(float lrate) : inodes(INPUT), hnodes(HIDDEN), onodes(OUTPUT), lrate(lrate), ph1(nullptr), po1(nullptr) {
+    trainer(float lrate) : lrate(lrate), ph1(nullptr), po1(nullptr) {
         pwih = new Matrix<float, INPUT, HIDDEN>();
         pwho = new Matrix<float, HIDDEN, OUTPUT>();
         *pwih = Matrix<float, INPUT, HIDDEN>::Random();
@@ -254,10 +254,6 @@ protected:
         }
         return ret;
     }
-    
-    const int inodes;
-    const int hnodes;
-    const int onodes;
     
     float lrate;
     

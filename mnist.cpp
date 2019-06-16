@@ -18,8 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// #define EIGEN_USE_MKL_ALL
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -117,51 +115,79 @@ void interact(std::vector<std::pair<unsigned char, std::vector<unsigned char>>> 
     std::string s;
     while (true) {
         std::cin >> s;
-        if (s.length() > 0) {
-            if (s == "q" ||
-                s == "quit" ||
-                s == "exit") {
-                break;
+        if (s.empty() || s == "?" || s == "h" || s == "help") {
+            std::cout << "usage: " << std::endl;
+            std::cout << "    ?, h, help          show this help" << std::endl;
+            std::cout << "    q, quit, exit       exit program" << std::endl;
+            std::cout << "    <num>               view data at index <num>" << std::endl;
+            std::cout << "    p[:]<num>           predict data at index <num>" << std::endl;
+            std::cout << "    train[:]<loop>      train <loop>s use loaded dataset" << std::endl;
+            std::cout << "    save[:]<file>       save model to <file>" << std::endl;
+            std::cout << "    load[:]<file>       load model from <file>" << std::endl;
+            continue;
+        }
+        if (s == "q" ||
+            s == "quit" ||
+            s == "exit") {
+            break;
+        }
+        if (s.substr(0, 4) == "load") {
+            s = s.substr(4);
+            if (!s.empty() && s[0] == ':') {
+                s = s.substr(1);
             }
-            if (s.substr(0, 4) == "load") {
-                s = s.substr(4);
-                while (!s.empty() && s[0] == ':') {
-                    s = s.substr(1);
-                }
-                if (s.empty()) {
-                    std::cout << "no file path" << std::endl;
-                    continue;
-                }
-                if (tr.loadModel(s.c_str()) < 0) {
-                    std::cout << "cannot load: " << s << std::endl;
-                } else {
-                    std::cout << "loaded" << std::endl;
-                }
+            if (s.empty()) {
+                std::cout << "no file path" << std::endl;
                 continue;
             }
-            if (s.substr(0, 4) == "save") {
-                s = s.substr(4);
-                while (!s.empty() && s[0] == ':') {
-                    s = s.substr(1);
-                }
-                if (s.empty()) {
-                    std::cout << "no file path" << std::endl;
-                    continue;
-                }
-                if (tr.saveModel(s.c_str()) < 0) {
-                    std::cout << "cannot save: " << s << std::endl;
-                } else {
-                    std::cout << "saved" << std::endl;
-                }
+            if (tr.loadModel(s.c_str()) < 0) {
+                std::cout << "cannot load: " << s << std::endl;
+            } else {
+                std::cout << "loaded" << std::endl;
+            }
+            continue;
+        }
+        if (s.substr(0, 4) == "save") {
+            s = s.substr(4);
+            if (!s.empty() && s[0] == ':') {
+                s = s.substr(1);
+            }
+            if (s.empty()) {
+                std::cout << "no file path" << std::endl;
                 continue;
             }
-            if (s == "train") {
-                auto bt = std::chrono::system_clock::now();
-                Matrix<float, Dynamic, 784> m = Matrix<float, Dynamic, 784>::Random(30, 784);
-                Matrix<float, Dynamic, 10> t = Matrix<float, Dynamic, 10>::Random(30, 10);
+            if (tr.saveModel(s.c_str()) < 0) {
+                std::cout << "cannot save: " << s << std::endl;
+            } else {
+                std::cout << "saved" << std::endl;
+            }
+            continue;
+        }
+        if (s.substr(0, 5) == "train") {
+            s = s.substr(5);
+            if (!s.empty() && s[0] == ':') {
+                s = s.substr(1);
+            }
+            int epochs = 1;
+            if (!s.empty()) {
+                if (!is_digits(s)) {
+                    std::cout << "invalid epochs: " << s << std::endl;
+                    continue;
+                }
+                epochs = stoi(s);
+                if (epochs <= 0) {
+                    std::cout << "epochs: " << epochs << " too small, set to 1" << std::endl;
+                    epochs = 1;
+                }
+            }
+            auto bt = std::chrono::system_clock::now();
+            const int Batch = 50;
+            Matrix<float, Dynamic, 784> m = Matrix<float, Dynamic, 784>::Random(Batch, 784);
+            Matrix<float, Dynamic, 10> t = Matrix<float, Dynamic, 10>::Random(Batch, 10);
+            for (int lp = 0; lp < epochs; ++lp) {
                 int i = 0;
                 while (i < data.size()) {
-                    int e = i + 30;
+                    int e = i + Batch;
                     if (e > data.size()) {
                         e = data.size();
                     }
@@ -180,66 +206,69 @@ void interact(std::vector<std::pair<unsigned char, std::vector<unsigned char>>> 
                         }
                         tr.train(m, t);
                     }
-                    if (i % 600 == 0) {
-                        std::cout << "trained: " << i << std::endl;
+                    if (i % 1000 == 0) {
+                        std::cout << "loop: " << lp + 1 << " trained: " << i << std::endl;
                     }
                 }
-                auto et = std::chrono::system_clock::now();
-                std::chrono::duration<double> elapsed_seconds = et - bt;
-                std::cout << "finished, used " << elapsed_seconds.count() << "sec(s)" << std::endl;
-                continue;
             }
-            if (s[0] == 'p') {
+            auto et = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_seconds = et - bt;
+            std::cout << "finished, used " << elapsed_seconds.count() << "sec(s)" << std::endl;
+            continue;
+        }
+        if (s[0] == 'p') {
+            s = s.substr(1);
+            if (!s.empty() && s[0] == ':') {
                 s = s.substr(1);
-                if (s.empty()) {
-                    std::cout << "missing index" << std::endl;
-                } else if (!is_digits(s)) {
+            }
+            if (s.empty()) {
+                std::cout << "missing index" << std::endl;
+            } else if (!is_digits(s)) {
+                std::cout << "invalid index: " << s << std::endl;
+            } else {
+                int i = stoi(s);
+                if (i < 0 &&
+                    i >= data.size()) {
                     std::cout << "invalid index: " << s << std::endl;
                 } else {
-                    int i = stoi(s);
-                    if (i < 0 &&
-                        i >= data.size()) {
-                        std::cout << "invalid index: " << s << std::endl;
-                    } else {
-                        const auto &p = data[i];
-                        std::cout << i << " target: " << int(p.first) << std::endl;
-                        Matrix<float, Dynamic, 784> m = Matrix<float, Dynamic, 784>::Random(1, 784);
-                        for (int i = 0; i < 784; ++i) {
-                            m(0, i) = p.second[i];
-                        }
-                        auto pred = tr.predict(m);
-                        std::cout << pred << std::endl;
+                    const auto &p = data[i];
+                    std::cout << i << " target: " << int(p.first) << std::endl;
+                    Matrix<float, Dynamic, 784> m = Matrix<float, Dynamic, 784>::Random(1, 784);
+                    for (int i = 0; i < 784; ++i) {
+                        m(0, i) = p.second[i];
                     }
+                    auto pred = tr.predict(m);
+                    std::cout << pred << std::endl;
                 }
-                continue;
             }
-            if (!is_digits(s)) {
-                std::cout << "unknown command: " << s << std::endl;
-                std::cout << "try some number or q, quit, exit" << std::endl;
-                continue;
-            }
-            int i = stoi(s);
-            if (i >= 0 &&
-                i < data.size()) {
-                const auto &p = data[i];
-                std::cout << i << " target: " << int(p.first) << std::endl;
-                for (int l = 0; l < 28; ++l) {
-                    for (int c = 0; c < 28; ++c) {
-                        std::cout << to_hex(p.second[l * 28 + c]);
-                    }
-                    std::cout << std::endl;
-                }
-                continue;
-            }
-            std::cout << "invalid index: " << i << std::endl;
+            continue;
         }
+        if (!is_digits(s)) {
+            std::cout << "invalid index: " << s << std::endl;
+            continue;
+        }
+        int i = stoi(s);
+        if (i >= 0 &&
+            i < data.size()) {
+            const auto &p = data[i];
+            std::cout << i << " target: " << int(p.first) << std::endl;
+            for (int l = 0; l < 28; ++l) {
+                for (int c = 0; c < 28; ++c) {
+                    std::cout << to_hex(p.second[l * 28 + c]);
+                }
+                std::cout << std::endl;
+            }
+            continue;
+        }
+        std::cout << "invalid index: " << i << std::endl;
     }
 }
 
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        std::cout << "no file path" << std::endl;
+        std::cout << "usage:" << std::endl;
+        std::cout << "    " << argv[0] << " <path_to_mnist_csv> [record_count_hint]" << std::endl;
         return 0;
     } else if (argc == 3) {
         std::string cs = argv[2];
