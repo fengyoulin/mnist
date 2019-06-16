@@ -34,6 +34,7 @@ usage:
     q, quit, exit       exit program
     <num>               view data at index <num>
     p[:]<num>           predict data at index <num>
+    auc[:]<count>       evaluate accuracy use <num> records
     train[:]<loop>      train <loop>s use loaded dataset
     save[:]<file>       save model to <file>
     load[:]<file>       load model from <file>
