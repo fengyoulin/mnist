@@ -121,7 +121,7 @@ void interact(std::vector<std::pair<unsigned char, std::vector<unsigned char>>> 
             std::cout << "    q, quit, exit       exit program" << std::endl;
             std::cout << "    <num>               view data at index <num>" << std::endl;
             std::cout << "    p[:]<num>           predict data at index <num>" << std::endl;
-            std::cout << "    auc[:]<count>       evaluate accuracy use <num> records" << std::endl;
+            std::cout << "    auc[:]<count>       evaluate accuracy use <count> records" << std::endl;
             std::cout << "    train[:]<loop>      train <loop>s use loaded dataset" << std::endl;
             std::cout << "    save[:]<file>       save model to <file>" << std::endl;
             std::cout << "    load[:]<file>       load model from <file>" << std::endl;
