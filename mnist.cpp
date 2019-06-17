@@ -114,6 +114,7 @@ void interact(std::vector<std::pair<unsigned char, std::vector<unsigned char>>> 
 {
     std::string s;
     while (true) {
+        std::cout << "#> ";
         std::cin >> s;
         if (s.empty() || s == "?" || s == "h" || s == "help") {
             std::cout << "usage: " << std::endl;

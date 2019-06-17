@@ -22,11 +22,13 @@ Init the depends:
 ./init.sh
 ```
 
+Make the program:
+
 ```
 make
 ```
 
-With Intel MKL, faster:
+Or make with Intel MKL, your program will run faster:
 
 ```
 make mkl
@@ -43,6 +45,7 @@ Start program and load data:
 Interactive commands:
 
 ```
+#> h
 usage:
     ?, h, help          show this help
     q, quit, exit       exit program
@@ -60,7 +63,7 @@ usage:
 $ ./mnist mnist_train.csv 60000
 loaded, used 0.496696sec(s)
 mnist_train.csv: 60000
-train20
+#> train20
 loop: 1 trained: 1000
 loop: 1 trained: 2000
 loop: 1 trained: 3000
@@ -75,20 +78,20 @@ loop: 20 trained: 58000
 loop: 20 trained: 59000
 loop: 20 trained: 60000
 finished, used 90.6669sec(s)
-auc
+#> auc
 auc: 0.97385
-save:loop20.model
+#> save:loop20.model
 saved
-q
+#> q
 
 $ ./mnist mnist_test.csv
 loaded, used 0.0866343sec(s)
 mnist_test.csv: 10000
-load:loop20.model
+#> load:loop20.model
 loaded
-auc
+#> auc
 auc: 0.9624
-0
+#> 0
 0 target: 7
 00000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000
@@ -118,8 +121,8 @@ auc: 0.9624
 0000000000000000000079FEFEDB2800000000000000000000000000
 0000000000000000000079FECF120000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000
-p:0
+#> p:0
 0 target: 7
  3.7182e-13 1.22278e-09 5.00913e-11 2.11027e-14 6.33932e-16 4.05016e-09 2.30942e-17           1 8.18387e-16 2.56971e-15
-q
+#> q
 ```
