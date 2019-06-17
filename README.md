@@ -57,6 +57,30 @@ usage:
 ## Example ##
 
 ```
+$ ./mnist mnist_train.csv 60000
+loaded, used 0.496696sec(s)
+mnist_train.csv: 60000
+train20
+loop: 1 trained: 1000
+loop: 1 trained: 2000
+loop: 1 trained: 3000
+loop: 1 trained: 4000
+loop: 1 trained: 5000
+...
+...
+loop: 20 trained: 55000
+loop: 20 trained: 56000
+loop: 20 trained: 57000
+loop: 20 trained: 58000
+loop: 20 trained: 59000
+loop: 20 trained: 60000
+finished, used 90.6669sec(s)
+auc
+auc: 0.97385
+save:loop20.model
+saved
+q
+
 $ ./mnist mnist_test.csv
 loaded, used 0.0866343sec(s)
 mnist_test.csv: 10000
