@@ -273,13 +273,22 @@ void interact(std::vector<std::pair<unsigned char, std::vector<unsigned char>>> 
                     std::cout << "invalid index: " << s << std::endl;
                 } else {
                     const auto &p = data[i];
-                    std::cout << i << " target: " << int(p.first) << std::endl;
                     Matrix<float, Dynamic, 784> m = Matrix<float, Dynamic, 784>::Random(1, 784);
                     for (int i = 0; i < 784; ++i) {
                         m(0, i) = p.second[i];
                     }
                     auto pred = tr.predict(m);
-                    std::cout << pred << std::endl;
+                    std::stringstream ss;
+                    int pn = 0;
+                    for (int i = 0; i < 10; ++i) {
+                        float p = pred(0, i);
+                        if (p > pred(0, pn)) {
+                            pn = i;
+                        }
+                        ss << i << ": " << p << std::endl;
+                    }
+                    std::cout << i << " target: " << int(p.first) << ", predict: " << pn << std::endl;
+                    std::cout << ss.str();
                 }
             }
             continue;
